@@ -30,6 +30,18 @@
       font-family: sans-serif;
       opacity: 0.95;
     }
+    #preview-btn {
+      margin-left: 10px;
+      background: #444;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #preview-btn:hover {
+      background: #555;
+    }
   </style>
   <!-- Add Monaco Editor CDN -->
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.44.0/min/vs/loader.js"></script>
@@ -53,6 +65,7 @@
       <option value="nodejs">Node.js</option>
       <option value="flutter">Flutter</option>
     </select>
+    <button id="preview-btn">Preview</button>
   </div>
   <div id="container" style="display:none"></div>
   <div id="editor"></div>
@@ -193,6 +206,40 @@
         editor.setValue(templates[lang] || '');
         editor.updateOptions({ language: langMap[lang] || lang });
         monaco.editor.setModelLanguage(editor.getModel(), langMap[lang] || lang);
+      });
+
+      document.getElementById('preview-btn').addEventListener('click', function() {
+        const lang = document.getElementById('lang-select').value;
+        const code = editor.getValue();
+
+        if (lang === 'html' || lang === 'javascript' || lang === 'css') {
+          const previewWindow = window.open('', '_blank');
+          if (lang === 'html') {
+            previewWindow.document.write(code);
+          } else if (lang === 'javascript') {
+            previewWindow.document.write(`
+              <html>
+                <body>
+                  <script>${code}<\/script>
+                </body>
+              </html>
+            `);
+          } else if (lang === 'css') {
+            previewWindow.document.write(`
+              <html>
+                <head>
+                  <style>${code}</style>
+                </head>
+                <body>
+                  <h1>CSS Preview</h1>
+                </body>
+              </html>
+            `);
+          }
+          previewWindow.document.close();
+        } else {
+          alert('Preview is not supported for this language.');
+        }
       });
     });
   </script>
